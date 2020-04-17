@@ -8,7 +8,7 @@ export default class PortfoForm extends Component {
     this.state = {
       name: '',
       description: '',
-      category: '',
+      category: 'eCommerce',
       position: '',
       url: '',
       thumb_image: '',
