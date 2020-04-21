@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 
+
 import PortfolioSidebarList from "../portfolio/portfolio-sidebar-list";
 import PortfolioForm from "../portfolio/portfolio-form"
 
@@ -14,12 +15,27 @@ export default class PortfolioManager extends Component {
 
     this.handleSuccessfulFormSubmission = this.handleSuccessfulFormSubmission.bind(this)
     this.handleFormSubmissionError = this.handleFormSubmissionError.bind(this)
+    this.handleDeleteClick = this.handleDeleteClick.bind(this)
+  }
+
+  handleDeleteClick(portfolioItem) {
+    axios.delete(`https://api.devcamp.space/portfolio/portfolio_items/${portfolioItem.id}`, { withCredentials: true }
+    ).then(response => {
+      this.setState({
+        portfolioItems: this.state.portfolioItems.filter(item => {
+          return item.id !== portfolioItem.id;
+        })
+      })
+      return response.data;
+    }).catch(error => {
+      console.log("handleDeleteClick error", error)
+    })
   }
 
   handleSuccessfulFormSubmission(portfolioItem) {
-    // TODO
-    // update portfolioitems state
-    // add the portfolioitem to the list
+    this.setState({
+      portfolioItems: [portfolioItem].concat(this.state.portfolioItems)
+    })
   }
 
   handleFormSubmissionError(error) {
@@ -28,7 +44,7 @@ export default class PortfolioManager extends Component {
 
   getPortfolioItems() {
     axios
-      .get("https://jesslarson93.devcamp.space/portfolio/portfolio_items", {
+      .get("https://jesslarson93.devcamp.space/portfolio/portfolio_items?order_by=created_at&direction=desc", {
         withCredentials: true
       })
       .then(response => {
@@ -56,7 +72,10 @@ export default class PortfolioManager extends Component {
         </div>
 
         <div className="right-column">
-          <PortfolioSidebarList data={this.state.portfolioItems} />
+          <PortfolioSidebarList
+            handleDeleteClick={this.handleDeleteClick}
+            data={this.state.portfolioItems}
+          />
         </div>
       </div>
     );
